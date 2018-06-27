@@ -39,9 +39,6 @@ on_success:
   - ps: $Readme = Get-Content readme.md
   - ps: '$Readme -replace "Version: \d*\.\d*\.\d*","Version: $env:APPVEYOR_BUILD_VERSION" | Set-Content README.md'
   
-  # ----- Update the module manifests version
-  - ps: Update-ModuleManifest -Path SCCM.psd1 -ModuleVersion $env:APPVEYOR_BUILD_VERSION
-  
   # ----- Push back to Github
   - git checkout master
   - git add --all
