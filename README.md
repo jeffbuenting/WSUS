@@ -2,6 +2,9 @@
 
 Poweshell WSUS Scripts
 
+Version
+[![Build status](https://ci.appveyor.com/api/projects/status/dsuip8l5i55olrtj/branch/master?svg=true)](https://ci.appveyor.com/project/jeffbuenting/wsus/branch/master)
+
 
 ### Functions
 - **Cleanup-WSUSServerMaintenance** 
