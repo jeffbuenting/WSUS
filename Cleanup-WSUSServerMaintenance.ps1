@@ -37,19 +37,20 @@ Param (
 )
 
 # ----- Check if WSUSCleanup source exists : http://stackoverflow.com/questions/28196488/how-to-check-if-event-log-with-certain-source-name-exists
-if ( [System.Diagnostics.Eventlog]::SourceExists( "WSUSCleanup" ) -eq $False ) {
-    New-EventLog -LogName Application -Source "WSUSCleanup"
-}
+Write-Verbose "Adding source to application log"
+#if ( [System.Diagnostics.Eventlog]::SourceExists( "WSUSCleanup" ) -eq $False ) {
+    New-EventLog -LogName Application -Source "WSUSCleanup" -ErrorAction SilentlyContinue
+#}
 
 # ----- WSUS Cleanup
 Try {
     Write-Verbose "Running WSUS Cleanup Wizard"
-    $CleanupLog = Get-WSUSServer -Name $ComputerName -PortNumber $Port | Invoke-WsusServerCleanup -CleanupObsoleteUpdates -CleanupObsoleteComputers -CleanupUnneededContentFiles -Verbose 4>&1
+    $CleanupLog = Invoke-WsusServerCleanup -UpdateServer (Get-WSUSServer -Name $ComputerName -PortNumber $Port ) -CleanupObsoleteUpdates -CleanupObsoleteComputers -CleanupUnneededContentFiles -Verbose 4>&1
 }
 Catch {
     $EXceptionMessage = $_.Exception.Message
     $ExceptionType = $_.exception.GetType().fullname
-    Write-EventLog -LogName Application -Source WSUSCleanup -EventID 9999 -EntryType Error -Message "Problem running WSUS Cleanup Wizard .`n`n     $ExceptionMessage`n`n     Exception : $ExceptionType"
+    Write-EventLog -LogName Application -Source WSUSCleanup -EventID 9991 -EntryType Error -Message "Problem running WSUS Cleanup Wizard .`n`n     $ExceptionMessage`n`n     Exception : $ExceptionType"
 
     Throw "Problem running WSUS Cleanup Wizard .`n`n     $ExceptionMessage`n`n     Exception : $ExceptionType"
 }
@@ -199,4 +200,4 @@ $ReindexLog = invoke-Command -ComputerName $SQLServer -ScriptBlock {
 # ----- Write To Log
 
 
-Write-EventLog -LogName Application -Source WSUSCleanup -EventID 9999 -EntryType Information -Message "WSUSCleanup has Completed : `n`n`n$($CleanupLog | Out-String)`n`n`n$($ReindexLog | Out-String)"
+Write-EventLog -LogName Application -Source WSUSCleanup -EventID 9990 -EntryType Information -Message "WSUSCleanup has Completed : `n`n`n$($CleanupLog | Out-String)`n`n`n$($ReindexLog | Out-String)"
